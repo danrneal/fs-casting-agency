@@ -6,6 +6,7 @@ Attributes:
 
 Classes:
     Movie()
+    Artist()
 """
 
 import os
@@ -69,6 +70,53 @@ class Movie(db.Model):
             "id": self.id,
             "title": self.title,
             "release_date": self.release_date,
+        }
+
+        return movie
+
+
+class Actor(db.Model):
+    """A model representing an actor.
+
+    Attributes:
+        id: An int that serves as the unique identifier for an actor
+        name: A str representing the name of the actor
+        age: An int representing the age of the actor
+        gender: A str representing the gender of the actor
+    """
+
+    __tablename__ = "actors"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    age = Column(Integer)
+    gender = Column(String)
+
+    def insert(self):
+        """Inserts a new actor object into the db."""
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        """Updates an existing actor object in the db."""
+        db.session.commit()
+
+    def delete(self):
+        """Deletes an existing actor object from the db."""
+        db.session.delete(self)
+        db.session.commit()
+
+    def format(self):
+        """Formats the actor object as a dict.
+
+        Returns:
+            actor: A dict representing the actor object
+        """
+        movie = {
+            "id": self.id,
+            "name": self.name,
+            "age": self.age,
+            "gender": self.gender,
         }
 
         return movie

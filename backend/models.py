@@ -11,10 +11,17 @@ Classes:
 
 import os
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Integer, Date
+from sqlalchemy import Column, String, Integer, Date, Table, ForeignKey
+from sqlalchemy.orm import relationship
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 db = SQLAlchemy()
+
+movie_actors = Table(
+    "movie_actors",
+    Column("movie_id", Integer, ForeignKey("movies.id"), primary_key=True),
+    Column("actor_id", Integer, ForeignKey("actors.id"), primary_key=True),
+)
 
 
 def setup_db(app, database_url=DATABASE_URL):
@@ -45,6 +52,7 @@ class Movie(db.Model):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     release_date = Column(Date)
+    actors = relationship("Actor", secondary=movie_actors, backref="movie")
 
     def insert(self):
         """Inserts a new movie object into the db."""
@@ -91,6 +99,7 @@ class Actor(db.Model):
     name = Column(String)
     age = Column(Integer)
     gender = Column(String)
+    movies = relationship("Movie", secondary=movie_actors, backref="actors")
 
     def insert(self):
         """Inserts a new actor object into the db."""

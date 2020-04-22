@@ -1,7 +1,7 @@
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 from auth import requires_auth, AuthError
-from models import setup_db, Movie
+from models import setup_db, Movie, Actor
 
 app = Flask(__name__)
 setup_db(app)
@@ -54,6 +54,50 @@ def get_movies():
             "total_movies": len(movies),
         }
     )
+
+    return response
+
+
+@app.route("/movies", methods=["POST"])
+@requires_auth("create:movies")
+def create_movie():
+    """Route handler for the endpoint for creating a new movie.
+
+    Returns:
+        response: A json object representing info about the created movie
+    """
+    try:
+        actor_names = request.json.get("actors")
+        actors = []
+        if actor_names is not None:
+            for actor_name in actor_names:
+                actor = Actor.query.filter_by(name=actor_name).first()
+
+                if actor is None:
+                    raise AttributeError
+
+                actors.append(actor)
+
+        movie = Movie(
+            title=request.json.get("title"),
+            release_date=request.json.get("release_date"),
+            poster=request.json.get("poster"),
+            actors=actors,
+        )
+
+        movie.insert()
+
+        response = jsonify(
+            {
+                "success": True,
+                "created_movie_id": movie.id,
+                "old_movie": None,
+                "new_movie": movie.format(),
+            }
+        )
+
+    except AttributeError:
+        abort(400)
 
     return response
 

@@ -10,6 +10,30 @@ CORS(app)
 MOVIES_PER_PAGE = 25
 
 
+def get_actors(actor_names):
+    """Gets a list of actor objects from a list of actor names.
+
+    Args:
+        actor_names: A list of strs representing the names of actors
+
+    Returns:
+        actors: A list of actor objects corresponding to the actor names
+            passed in
+    """
+    actors = []
+
+    if actor_names is not None:
+        for actor_name in actor_names:
+            actor = Actor.query.filter_by(name=actor_name).first()
+
+            if actor is None:
+                raise AttributeError
+
+            actors.append(actor)
+
+    return actors
+
+
 @app.after_request
 def after_request(response):
     """Adds response headers after request.
@@ -67,22 +91,12 @@ def create_movie():
         response: A json object representing info about the created movie
     """
     try:
-        actor_names = request.json.get("actors")
-        actors = []
-        if actor_names is not None:
-            for actor_name in actor_names:
-                actor = Actor.query.filter_by(name=actor_name).first()
-
-                if actor is None:
-                    raise AttributeError
-
-                actors.append(actor)
 
         movie = Movie(
             title=request.json.get("title"),
             release_date=request.json.get("release_date"),
             poster=request.json.get("poster"),
-            actors=actors,
+            actors=get_actors(request.json.get("actors")),
         )
 
         movie.insert()
@@ -124,15 +138,6 @@ def update_movie(movie_id):
         release_date = request.json.get("release_date")
         poster = request.json.get("poster")
         actor_names = request.json.get("actors")
-        actors = []
-        if actor_names is not None:
-            for actor_name in actor_names:
-                actor = Actor.query.filter_by(name=actor_name).first()
-
-                if actor is None:
-                    raise AttributeError
-
-                actors.append(actor)
 
         if title is not None:
             movie.title = title
@@ -144,7 +149,7 @@ def update_movie(movie_id):
             movie.poster = poster
 
         if actor_names is not None:
-            movie.actors = actors
+            movie.actors = get_actors(actor_names)
 
         movie.update()
 

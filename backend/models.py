@@ -87,8 +87,7 @@ class Movie(db.Model):
             "release_date": self.release_date,
             "poster": self.poster,
             "actors": [
-                {"id": actor["id"], "name": actor["name"]}
-                for actor in self.actors
+                {"id": actor.id, "name": actor.name} for actor in self.actors
             ],
         }
 
@@ -142,9 +141,9 @@ class Actor(db.Model):
             "image": self.image,
             "movies": [
                 {
-                    "id": movie["id"],
-                    "title": movie["title"],
-                    "release_date": movie["release_date"],
+                    "id": movie.id,
+                    "title": movie.title,
+                    "release_date": movie.release_date,
                 }
                 for movie in self.movies
             ],

@@ -3,6 +3,8 @@
 Attributes:
     DATABASE_URL: A str representing the location of the db
     db: A SQLAlchemy service
+    movie_actors: A SQLAlchemy association table to map the many-to-many
+        relationship between movies and actors
 
 Classes:
     Movie()
@@ -11,13 +13,13 @@ Classes:
 
 import os
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Integer, Date, Table, ForeignKey
+from sqlalchemy import Column, String, Integer, Date, ForeignKey
 from sqlalchemy.orm import relationship
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 db = SQLAlchemy()
 
-movie_actors = Table(
+movie_actors = db.Table(
     "movie_actors",
     Column("movie_id", Integer, ForeignKey("movies.id"), primary_key=True),
     Column("actor_id", Integer, ForeignKey("actors.id"), primary_key=True),

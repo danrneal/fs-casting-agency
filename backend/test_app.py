@@ -72,6 +72,22 @@ class PublicMovieTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "method_not_allowed")
 
+    def test_movie_get_method_not_allowed_fail(self):
+        """Test that get method is not allowed at /movies/id endpoint."""
+        response = self.client().get("/movies/1")
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "method_not_allowed")
+
+    def test_movie_post_method_not_allowed_fail(self):
+        """Test that post method is not allowed at /movies/id endpoint."""
+        response = self.client().post("/movies/1")
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "method_not_allowed")
+
 
 class CastingAssistantMovieTestCase(unittest.TestCase):
     """Contains the test cases for the casting assistant movie endpoints.
@@ -117,6 +133,18 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "not_found")
 
+    def test_movie_patch_auth_fail(self):
+        """Test failed updating of a movie when unauthorized."""
+        movie_id = Movie.query.order_by(Movie.id.desc()).first().id
+
+        response = self.client().patch(f"/movies/{movie_id}")
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(
+            response.json.get("error_code"), "authorization_header_missing"
+        )
+
 
 class CastingDirectorMovieTestCase(unittest.TestCase):
     """Contains the test cases for the casting director movie endpoints.
@@ -148,6 +176,56 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "forbidden")
+
+    def test_patch_movie_success(self):
+        """Test successful update of a movie."""
+        old_movie = Movie.query.order_by(Movie.id.desc()).first().format()
+        movie_id = old_movie["id"]
+        new_movie = {
+            "title": "Iron Man",
+            "release_date": "2008-05-02",
+            "poster": (
+                "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5Ba"
+                "nBnXkFtZTcwMTU0NTIzMw@@._V1_SY1000_CR0,0,674,1000_AL_.jpg"
+            ),
+            "actors": ["Robert Downey Jr.", "Jeff Bridges"],
+        }
+
+        response = self.client().patch(
+            f"/movies/{movie_id}", json=new_movie, headers=self.headers
+        )
+
+        movie = Movie.query.get(movie_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json.get("success"), True)
+        self.assertEqual(response.json.get("updated_movie_id"), movie_id)
+        self.assertEqual(response.json.get("old_movie"), old_movie)
+        self.assertTrue(response.json.get("new_movie"))
+        self.assertIsNotNone(movie)
+
+    def test_patch_movie_out_of_range_fail(self):
+        """Test failed movie update when movie does not exist."""
+        movie_id = Movie.query.order_by(Movie.id.desc()).first().id
+        new_movie = {
+            "title": "Iron Man",
+            "release_date": "2008-05-02",
+            "poster": (
+                "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5Ba"
+                "nBnXkFtZTcwMTU0NTIzMw@@._V1_SY1000_CR0,0,674,1000_AL_.jpg"
+            ),
+            "actors": ["Robert Downey Jr.", "Jeff Bridges"],
+        }
+
+        response = self.client().patch(
+            f"/movies/{movie_id+1}", json=new_movie, headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(
+            response.json.get("error_code"), "unprocessable_entity"
+        )
 
 
 class ExecutiveProducerMovieTestCase(unittest.TestCase):

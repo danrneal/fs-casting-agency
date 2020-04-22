@@ -16,7 +16,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, Date, ForeignKey
 from sqlalchemy.orm import relationship
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.environ["DATABASE_URL"]
 db = SQLAlchemy()
 
 movie_actors = db.Table(
@@ -38,6 +38,7 @@ def setup_db(app, database_url=DATABASE_URL):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
+    db.create_all()
 
 
 class Movie(db.Model):

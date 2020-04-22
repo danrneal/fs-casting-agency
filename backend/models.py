@@ -92,7 +92,7 @@ class Actor(db.Model):
     Attributes:
         id: An int that serves as the unique identifier for an actor
         name: A str representing the name of the actor
-        age: An int representing the age of the actor
+        birthdate: An date representing the birthdate of the actor
         gender: A str representing the gender of the actor
     """
 
@@ -100,7 +100,7 @@ class Actor(db.Model):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    age = Column(Integer)
+    birthdate = Column(Date)
     gender = Column(String)
     movies = relationship("Movie", secondary=movie_actors, backref="actors")
 
@@ -127,7 +127,7 @@ class Actor(db.Model):
         movie = {
             "id": self.id,
             "name": self.name,
-            "age": self.age,
+            "birthdate": self.birthdate,
             "gender": self.gender,
         }
 

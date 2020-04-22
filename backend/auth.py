@@ -16,7 +16,7 @@ from flask import request
 from jose import jwt
 from six.moves.urllib.request import urlopen
 
-AUTH0_DOMAIN = "casting-agency.auth0.com"
+AUTH0_DOMAIN = "fs-casting-agency.auth0.com"
 ALGORITHMS = ["RS256"]
 API_IDENTIFIER = "http://127.0.0.1/"
 

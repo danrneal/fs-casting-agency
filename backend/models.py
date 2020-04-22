@@ -48,6 +48,7 @@ class Movie(db.Model):
         id: An int that serves as the unique identifier for a movie
         title: A str representing the title of the movie
         release_date: A date representing the release date of the movie
+        poster: A str representing a url to an image of the movie's poster
     """
 
     __tablename__ = "movies"
@@ -55,6 +56,7 @@ class Movie(db.Model):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     release_date = Column(Date)
+    poster = Column(String)
     actors = relationship("Actor", secondary=movie_actors, backref="movie")
 
     def insert(self):
@@ -81,6 +83,7 @@ class Movie(db.Model):
             "id": self.id,
             "title": self.title,
             "release_date": self.release_date,
+            "poster": self.poster,
         }
 
         return movie
@@ -94,6 +97,7 @@ class Actor(db.Model):
         name: A str representing the name of the actor
         birthdate: An date representing the birthdate of the actor
         gender: A str representing the gender of the actor
+        image: A str representing a url to an image of the actor
     """
 
     __tablename__ = "actors"
@@ -102,7 +106,7 @@ class Actor(db.Model):
     name = Column(String)
     birthdate = Column(Date)
     gender = Column(String)
-    movies = relationship("Movie", secondary=movie_actors, backref="actors")
+    image = Column(String)
 
     def insert(self):
         """Inserts a new actor object into the db."""
@@ -129,6 +133,7 @@ class Actor(db.Model):
             "name": self.name,
             "birthdate": self.birthdate,
             "gender": self.gender,
+            "image": self.image,
         }
 
         return movie

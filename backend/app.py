@@ -102,6 +102,67 @@ def create_movie():
     return response
 
 
+@app.route("/movies/<int:movie_id>", methods=["PATCH"])
+@requires_auth("update:movies")
+def update_movie(movie_id):
+    """Route handler for endpoint updating a single movie.
+
+    Args:
+        movie_id: An int representing the identifier for the movie to update
+
+    Returns:
+        response: A json object representing info about the updated movie
+    """
+    movie = Movie.query.get(movie_id)
+
+    if movie is None:
+        abort(422)
+
+    try:
+        old_movie = movie.format()
+        title = request.json.get("title")
+        release_date = request.json.get("release_date")
+        poster = request.json.get("poster")
+        actor_names = request.json.get("actors")
+        actors = []
+        if actor_names is not None:
+            for actor_name in actor_names:
+                actor = Actor.query.filter_by(name=actor_name).first()
+
+                if actor is None:
+                    raise AttributeError
+
+                actors.append(actor)
+
+        if title is not None:
+            movie.title = title
+
+        if release_date is not None:
+            movie.release_date = release_date
+
+        if poster is not None:
+            movie.poster = poster
+
+        if actor_names is not None:
+            movie.actors = actors
+
+        movie.update()
+
+        response = jsonify(
+            {
+                "success": True,
+                "updated_movie_id": movie_id,
+                "old_movie": old_movie,
+                "new_movie": movie.format(),
+            }
+        )
+
+    except AttributeError:
+        abort(400)
+
+    return response
+
+
 @app.errorhandler(400)
 def bad_request(error):  # pylint: disable=unused-argument
     """Error handler for 400 bad request.

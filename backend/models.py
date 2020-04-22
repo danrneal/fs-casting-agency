@@ -49,6 +49,8 @@ class Movie(db.Model):
         title: A str representing the title of the movie
         release_date: A date representing the release date of the movie
         poster: A str representing a url to an image of the movie's poster
+        actors: A list of Actor objects representing the actors that play in
+            the movie
     """
 
     __tablename__ = "movies"
@@ -84,6 +86,10 @@ class Movie(db.Model):
             "title": self.title,
             "release_date": self.release_date,
             "poster": self.poster,
+            "actors": [
+                {"id": actor["id"], "name": actor["name"]}
+                for actor in self.actors
+            ],
         }
 
         return movie
@@ -134,6 +140,14 @@ class Actor(db.Model):
             "birthdate": self.birthdate,
             "gender": self.gender,
             "image": self.image,
+            "movies": [
+                {
+                    "id": movie["id"],
+                    "title": movie["title"],
+                    "release_date": movie["release_date"],
+                }
+                for movie in self.movies
+            ],
         }
 
         return movie

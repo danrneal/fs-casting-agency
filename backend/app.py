@@ -1,6 +1,6 @@
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
-from auth import requires_auth
+from auth import requires_auth, AuthError
 from models import setup_db, Movie
 
 app = Flask(__name__)
@@ -54,6 +54,123 @@ def get_movies():
             "total_movies": len(movies),
         }
     )
+
+    return response
+
+
+@app.errorhandler(400)
+def bad_request(error):  # pylint: disable=unused-argument
+    """Error handler for 400 bad request.
+
+    Args:
+        error: unused
+
+    Returns:
+        Response: A json object with the error code and message
+    """
+    response = jsonify(
+        {
+            "success": False,
+            "error_code": "bad_request",
+            "description": "The request was malformed in some way",
+        }
+    )
+    return response, 400
+
+
+@app.errorhandler(404)
+def not_found(error):  # pylint: disable=unused-argument
+    """Error handler for 404 not found.
+
+    Args:
+        error: unused
+
+    Returns:
+        Response: A json object with the error code and message
+    """
+    response = jsonify(
+        {
+            "success": False,
+            "error_code": "not_found",
+            "description": "The resource could not be found on the server",
+        }
+    )
+    return response, 404
+
+
+@app.errorhandler(405)
+def method_not_allowed(error):  # pylint: disable=unused-argument
+    """Error handler for 405 method not allowed.
+
+    Args:
+        error: unused
+
+    Returns:
+        Response: A json object with the error code and message
+    """
+    response = jsonify(
+        {
+            "success": False,
+            "error_code": "method_not_allowed",
+            "description": "Incorrect request method was specified",
+        }
+    )
+    return response, 405
+
+
+@app.errorhandler(422)
+def unprocessable_entity(error):  # pylint: disable=unused-argument
+    """Error handler for 422 unprocessable entity.
+
+    Args:
+        error: unused
+
+    Returns:
+        Response: A json object with the error code and message
+    """
+    response = jsonify(
+        {
+            "success": False,
+            "error_code": "unprocessable_entity",
+            "description": "The request was unable to be fulfilled",
+        }
+    )
+    return response, 422
+
+
+@app.errorhandler(500)
+def internal_server_error(error):  # pylint: disable=unused-argument
+    """Error handler for 500 internal server error.
+
+    Args:
+        error: unused
+
+    Returns:
+        Response: A json object with the error code and message
+    """
+    response = jsonify(
+        {
+            "success": False,
+            "error_code": "internal_server_error",
+            "description": "Something went wrong on the server",
+        }
+    )
+    return response, 500
+
+
+@app.errorhandler(AuthError)
+def authorization_error(error):
+    """Error handler for authorization error.
+
+    Args:
+        error: A dict representing the authorization error
+
+    Returns:
+        Response: A json object with the error code and message
+    """
+    error.error["success"] = False
+    response = jsonify(error.error)
+    response.status_code = error.status_code
 
     return response
 

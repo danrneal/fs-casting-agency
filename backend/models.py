@@ -133,7 +133,7 @@ class Actor(db.Model):
         Returns:
             actor: A dict representing the actor object
         """
-        movie = {
+        actor = {
             "id": self.id,
             "name": self.name,
             "birthdate": str(self.birthdate),
@@ -149,4 +149,4 @@ class Actor(db.Model):
             ],
         }
 
-        return movie
+        return actor

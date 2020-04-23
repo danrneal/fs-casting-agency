@@ -143,7 +143,7 @@ class Actor(db.Model):
                 {
                     "id": movie.id,
                     "title": movie.title,
-                    "release_date": movie.release_date,
+                    "release_date": str(movie.release_date),
                 }
                 for movie in self.movies
             ],

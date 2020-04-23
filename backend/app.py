@@ -287,6 +287,62 @@ def create_actor():
     return response
 
 
+@app.route("/actors/<int:actor_id>", methods=["PATCH"])
+@requires_auth("update:actors")
+def update_actor(actor_id):
+    """Route handler for endpoint updating a single actor.
+
+    Args:
+        actor_id: An int representing the identifier for the actor to update
+
+    Returns:
+        response: A json object representing info about the updated actor
+    """
+    actor = Actor.query.get(actor_id)
+
+    if actor is None:
+        abort(422)
+
+    try:
+        old_actor = actor.format()
+        name = request.json.get("name")
+        birthdate = request.json.get("birthdate")
+        gender = request.json.get("gender")
+        image = request.json.get("image")
+        movie_titles = request.json.get("movies")
+
+        if name is not None:
+            actor.name = name
+
+        if birthdate is not None:
+            actor.birthdate = birthdate
+
+        if gender is not None:
+            actor.gender = gender
+
+        if image is not None:
+            actor.image = image
+
+        if movie_titles is not None:
+            actor.moves = get_movies_from_titles(movie_titles)
+
+        actor.update()
+
+        response = jsonify(
+            {
+                "success": True,
+                "updated_actor_id": actor_id,
+                "old_actor": old_actor,
+                "new_actor": actor.format(),
+            }
+        )
+
+    except AttributeError:
+        abort(400)
+
+    return response
+
+
 @app.errorhandler(400)
 def bad_request(error):  # pylint: disable=unused-argument
     """Error handler for 400 bad request.

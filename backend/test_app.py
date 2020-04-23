@@ -204,6 +204,32 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         self.assertTrue(response.json.get("new_movie"))
         self.assertIsNotNone(movie)
 
+    def test_patch_movie_unrecognized_actor_fail(self):
+        """Test failed movie update when an actor doesn't exist in the db."""
+        movie_id = Movie.query.order_by(Movie.id.desc()).first().id
+        new_movie = {
+            "title": "Iron Man",
+            "release_date": "2008-05-02",
+            "poster": (
+                "https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5Ba"
+                "nBnXkFtZTcwMTU0NTIzMw@@._V1_SY1000_CR0,0,674,1000_AL_.jpg"
+            ),
+            "actors": [
+                "Robert Downey Jr.",
+                "Terrence Howard",
+                "Jeff Bridges",
+                "Gwyneth Paltrow",
+            ],
+        }
+
+        response = self.client().patch(
+            f"/movies/{movie_id}", json=new_movie, headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "bad_request")
+
     def test_patch_movie_out_of_range_fail(self):
         """Test failed movie update when movie does not exist."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
@@ -226,6 +252,18 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         self.assertEqual(
             response.json.get("error_code"), "unprocessable_entity"
         )
+
+    def test_patch_no_info_fail(self):
+        """Test failed movie update when in info is given."""
+        movie_id = Movie.query.order_by(Movie.id.desc()).first().id
+
+        response = self.client().patch(
+            f"/movies/{movie_id}", headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "bad_request")
 
 
 class ExecutiveProducerMovieTestCase(unittest.TestCase):

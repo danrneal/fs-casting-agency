@@ -8,6 +8,7 @@ setup_db(app)
 CORS(app)
 
 MOVIES_PER_PAGE = 25
+ACTORS_PER_PAGE = 25
 
 
 def get_actors_from_names(actor_names):
@@ -193,6 +194,34 @@ def delete_movie(movie_id):
             "deleted_movie_id": movie_id,
             "old_movie": old_movie,
             "new_movie": None,
+        }
+    )
+
+    return response
+
+
+@app.route("/actors", methods=["GET"])
+@requires_auth("read:actors")
+def get_actors():
+    """Route handler for the endpoint showing paginated actors.
+
+    Returns:
+        response: A json object representing a page of actors
+    """
+    page = request.args.get("page", 1, type=int)
+    start = (page - 1) * ACTORS_PER_PAGE
+    end = start + ACTORS_PER_PAGE
+    actors = Actor.query.order_by(Actor.name).all()
+    current_actors = [actor.format() for actor in actors][start:end]
+
+    if len(current_actors) == 0:
+        abort(404)
+
+    response = jsonify(
+        {
+            "success": True,
+            "actors": current_actors,
+            "total_actors": len(actors),
         }
     )
 

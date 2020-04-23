@@ -10,7 +10,7 @@ CORS(app)
 MOVIES_PER_PAGE = 25
 
 
-def get_actors(actor_names):
+def get_actors_from_names(actor_names):
     """Gets a list of actor objects from a list of actor names.
 
     Args:
@@ -96,7 +96,7 @@ def create_movie():
             title=request.json.get("title"),
             release_date=request.json.get("release_date"),
             poster=request.json.get("poster"),
-            actors=get_actors(request.json.get("actors")),
+            actors=get_actors_from_names(request.json.get("actors")),
         )
 
         movie.insert()
@@ -149,7 +149,7 @@ def update_movie(movie_id):
             movie.poster = poster
 
         if actor_names is not None:
-            movie.actors = get_actors(actor_names)
+            movie.actors = get_actors_from_names(actor_names)
 
         movie.update()
 

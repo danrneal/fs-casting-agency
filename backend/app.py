@@ -343,6 +343,37 @@ def update_actor(actor_id):
     return response
 
 
+@app.route("/actors/<int:actor_id>", methods=["DELETE"])
+@requires_auth("delete:actors")
+def delete_actor(actor_id):
+    """Route handler for endpoint to delete a single actor.
+
+    Args:
+        actor_id: An int representing the identifier for the actor to delete
+
+    Returns:
+        response: A json object representing info about the deleted actor
+    """
+    actor = Actor.query.get(actor_id)
+
+    if actor is None:
+        abort(422)
+
+    old_actor = actor.format()
+    actor.delete()
+
+    response = jsonify(
+        {
+            "success": True,
+            "deleted_actor_id": actor_id,
+            "old_actor": old_actor,
+            "new_actor": None,
+        }
+    )
+
+    return response
+
+
 @app.errorhandler(400)
 def bad_request(error):  # pylint: disable=unused-argument
     """Error handler for 400 bad request.

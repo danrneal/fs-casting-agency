@@ -499,6 +499,18 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "forbidden")
 
+    def test_actor_patch_auth_fail(self):
+        """Test failed updating of an actor when unauthorized."""
+        actor_id = Actor.query.order_by(Actor.id.desc()).first().id
+
+        response = self.client().patch(
+            f"/actors/{actor_id}", headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "forbidden")
+
 
 class CastingDirectorActorTestCase(unittest.TestCase):
     """Contains the test cases for the casting director actor endpoints.
@@ -579,6 +591,107 @@ class CastingDirectorActorTestCase(unittest.TestCase):
     def test_create_actor_no_info_fail(self):
         """Test failed actor creation when info is missing."""
         response = self.client().post("/actors", headers=self.headers)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "bad_request")
+
+    def test_patch_actor_success(self):
+        """Test successful update of an actor."""
+        old_actor = Actor.query.order_by(Actor.id.desc()).first().format()
+        actor_id = old_actor["id"]
+        new_actor = {
+            "name": "Tom Hiddleston	",
+            "birthdate": "1981-02-09",
+            "gender": "male",
+            "image": (
+                "https://image.tmdb.org/t/p/w500/qCoaGjDErox3MEsGrKeDAlRlZ1"
+                "J.jpg"
+            ),
+            "movies": [
+                "Avengers: Endgame",
+                "Avengers: Infinity War",
+                "The Avengers",
+            ],
+        }
+
+        response = self.client().patch(
+            f"/actors/{actor_id}", json=new_actor, headers=self.headers
+        )
+
+        actor = Actor.query.get(actor_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json.get("success"), True)
+        self.assertEqual(response.json.get("updated_actor_id"), actor_id)
+        self.assertEqual(response.json.get("old_actor"), old_actor)
+        self.assertTrue(response.json.get("new_actor"))
+        self.assertIsNotNone(actor)
+
+    def test_patch_actor_unrecognized_actor_fail(self):
+        """Test failed actor update when a movie doesn't exist in the db."""
+        actor_id = Actor.query.order_by(Actor.id.desc()).first().id
+        new_actor = {
+            "name": "Tom Hiddleston	",
+            "birthdate": "1981-02-09",
+            "gender": "male",
+            "image": (
+                "https://image.tmdb.org/t/p/w500/qCoaGjDErox3MEsGrKeDAlRlZ1"
+                "J.jpg"
+            ),
+            "movies": [
+                "Avengers: Endgame",
+                "Avengers: Infinity War",
+                "Thor: Ragnarok",
+                "Thor: The Dark World",
+                "The Avengers",
+                "Thor",
+            ],
+        }
+
+        response = self.client().patch(
+            f"/actors/{actor_id}", json=new_actor, headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "bad_request")
+
+    def test_patch_actor_out_of_range_fail(self):
+        """Test failed actor update when actor does not exist."""
+        actor_id = Actor.query.order_by(Actor.id.desc()).first().id
+        new_actor = {
+            "name": "Tom Hiddleston	",
+            "birthdate": "1981-02-09",
+            "gender": "male",
+            "image": (
+                "https://image.tmdb.org/t/p/w500/qCoaGjDErox3MEsGrKeDAlRlZ1"
+                "J.jpg"
+            ),
+            "movies": [
+                "Avengers: Endgame",
+                "Avengers: Infinity War",
+                "The Avengers",
+            ],
+        }
+
+        response = self.client().patch(
+            f"/actors/{actor_id+1}", json=new_actor, headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(
+            response.json.get("error_code"), "unprocessable_entity"
+        )
+
+    def test_patch_actor_no_info_fail(self):
+        """Test failed actor update when in info is given."""
+        actor_id = Actor.query.order_by(Actor.id.desc()).first().id
+
+        response = self.client().patch(
+            f"/actors/{actor_id}", headers=self.headers
+        )
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json.get("success"), False)

@@ -491,6 +491,99 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "not_found")
 
+    def test_create_actor_auth_fail(self):
+        """Test failed actor creation when unauthorized."""
+        response = self.client().post("/actors", headers=self.headers)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "forbidden")
+
+
+class CastingDirectorActorTestCase(unittest.TestCase):
+    """Contains the test cases for the casting director actor endpoints.
+
+    Attributes:
+        headers: A dict representing the auth headers to be sent with requests
+        app: A flask app from app.py
+        client: A test client for the flask app to use while testing
+        database_url: A str representing the location of the db used for
+            testing
+    """
+
+    def setUp(self):
+        """Set-up for CastingDirectorActorTestCase."""
+        self.headers = {"Authorization": f"Bearer {CASTING_DIRECTOR_TOKEN}"}
+        self.app = app
+        app.config["DEBUG"] = False
+        self.client = self.app.test_client
+        self.database_url = TEST_DATABASE_URL
+        setup_db(self.app, self.database_url)
+
+    def tearDown(self):
+        """Executed after each test."""
+
+    def test_create_actor_success(self):
+        """Test successful creation of a actor."""
+        new_actor = {
+            "name": "Jeremy Renner",
+            "birthdate": "1971-01-07",
+            "gender": "male",
+            "image": (
+                "https://image.tmdb.org/t/p/w500/ycFVAVMliCCf0zXsKWNLBG3Yxz"
+                "K.jpg"
+            ),
+            "movies": ["Avengers: Endgame", "The Avengers"],
+        }
+
+        response = self.client().post(
+            "/actors", json=new_actor, headers=self.headers
+        )
+
+        created_actor_id = response.json.get("created_actor_id")
+        actor = Actor.query.get(created_actor_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json.get("success"), True)
+        self.assertIsNone(response.json.get("old_actor"))
+        self.assertTrue(response.json.get("new_actor"))
+        self.assertIsNotNone(actor)
+
+    def test_create_actor_unrecognized_movie_fail(self):
+        """Test failed actor creation when a movie doesn't exist in the db."""
+        new_actor = {
+            "name": "Jeremy Renner",
+            "birthdate": "1971-01-07",
+            "gender": "male",
+            "image": (
+                "https://image.tmdb.org/t/p/w500/ycFVAVMliCCf0zXsKWNLBG3Yxz"
+                "K.jpg"
+            ),
+            "movies": [
+                "Avengers: Endgame",
+                "Captain America: Civil War",
+                "Avengers: Age of Ultron",
+                "The Avengers",
+                "Thor",
+            ],
+        }
+
+        response = self.client().post(
+            "/actors", json=new_actor, headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "bad_request")
+
+    def test_create_actor_no_info_fail(self):
+        """Test failed actor creation when info is missing."""
+        response = self.client().post("/actors", headers=self.headers)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "bad_request")
+
 
 if __name__ == "__main__":
     unittest.main()

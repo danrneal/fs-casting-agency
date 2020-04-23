@@ -1,3 +1,11 @@
+"""A flask-based casting agency API with Authorization and Authentication.
+
+Usage: flask run
+
+Attributes:
+    app: A flask Flask object creating the flask app
+"""
+
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS
 from auth import requires_auth, AuthError

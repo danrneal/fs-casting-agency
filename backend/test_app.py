@@ -16,7 +16,6 @@ Classes:
     PublicActorTestCase()
     CastingAssistantActorTestCase()
     CastingDirectorActorTestCase()
-    ExecutiveProducerActorTestCase()
 """
 
 import os
@@ -527,6 +526,18 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "forbidden")
 
+    def test_delete_actor_auth_fail(self):
+        """Test failed actor deletion when unauthorized."""
+        actor_id = Actor.query.order_by(Actor.id.desc()).first().id
+
+        response = self.client().delete(
+            f"/actors/{actor_id}", headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "forbidden")
+
 
 class CastingDirectorActorTestCase(unittest.TestCase):
     """Contains the test cases for the casting director actor endpoints.
@@ -712,6 +723,38 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "bad_request")
+
+    def test_delete_actor_success(self):
+        """Test successful deletion of actor."""
+        old_actor = Actor.query.order_by(Actor.id.desc()).first().format()
+        actor_id = old_actor["id"]
+
+        response = self.client().delete(
+            f"/actors/{actor_id}", headers=self.headers
+        )
+
+        actor = Actor.query.get(actor_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json.get("success"), True)
+        self.assertEqual(response.json.get("deleted_actor_id"), actor_id)
+        self.assertEqual(response.json.get("old_actor"), old_actor)
+        self.assertIsNone(response.json.get("new_actor"))
+        self.assertIsNone(actor)
+
+    def test_delete_actor_out_of_range_fail(self):
+        """Test failed actor deletion when actor does not exist."""
+        actor_id = Actor.query.order_by(Actor.id.desc()).first().id
+
+        response = self.client().delete(
+            f"/actors/{actor_id+1}", headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(
+            response.json.get("error_code"), "unprocessable_entity"
+        )
 
 
 if __name__ == "__main__":

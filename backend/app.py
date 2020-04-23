@@ -168,6 +168,37 @@ def update_movie(movie_id):
     return response
 
 
+@app.route("/movies/<int:movie_id>", methods=["DELETE"])
+@requires_auth("delete:movies")
+def delete_movie(movie_id):
+    """Route handler for endpoint to delete a single movie.
+
+    Args:
+        movie_id: An int representing the identifier for the movie to delete
+
+    Returns:
+        response: A json object representing info about the deleted movie
+    """
+    movie = Movie.query.get(movie_id)
+
+    if movie is None:
+        abort(422)
+
+    old_movie = movie.format()
+    movie.delete()
+
+    response = jsonify(
+        {
+            "success": True,
+            "deleted_movie_id": movie_id,
+            "old_movie": old_movie,
+            "new_movie": None,
+        }
+    )
+
+    return response
+
+
 @app.errorhandler(400)
 def bad_request(error):  # pylint: disable=unused-argument
     """Error handler for 400 bad request.

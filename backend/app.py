@@ -332,7 +332,7 @@ def update_actor(actor_id):
             actor.image = image
 
         if movie_titles is not None:
-            actor.moves = get_movies_from_titles(movie_titles)
+            actor.movies = get_movies_from_titles(movie_titles)
 
         actor.update()
 

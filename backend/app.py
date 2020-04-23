@@ -65,7 +65,7 @@ def get_movies():
     page = request.args.get("page", 1, type=int)
     start = (page - 1) * MOVIES_PER_PAGE
     end = start + MOVIES_PER_PAGE
-    movies = Movie.query.order_by(Movie.release_date).all()
+    movies = Movie.query.order_by(Movie.title).all()
     current_movies = [movie.format() for movie in movies][start:end]
 
     if len(current_movies) == 0:

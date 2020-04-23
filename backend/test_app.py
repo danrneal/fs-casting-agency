@@ -170,7 +170,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         """Executed after each test."""
 
     def test_create_movie_auth_fail(self):
-        """Test failed creation of movie when unauthorized."""
+        """Test failed movie creation when unauthorized."""
         response = self.client().post("/movies", headers=self.headers)
 
         self.assertEqual(response.status_code, 403)
@@ -253,7 +253,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
             response.json.get("error_code"), "unprocessable_entity"
         )
 
-    def test_patch_no_info_fail(self):
+    def test_patch_movie_no_info_fail(self):
         """Test failed movie update when in info is given."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 

@@ -118,8 +118,8 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json.get("success"), True)
-        self.assertTrue(response.json.get("movies"))
-        self.assertTrue(response.json.get("total_movies"))
+        self.assertEqual(len(response.json.get("movies")), MOVIES_PER_PAGE)
+        self.assertGreater(response.json.get("total_movies"), MOVIES_PER_PAGE)
 
     def test_get_paginated_movies_out_of_range_fail(self):
         """Test failed movie retrieval when page number is out of range."""

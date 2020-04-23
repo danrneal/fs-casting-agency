@@ -137,7 +137,7 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "not_found")
 
-    def test_movie_patch_auth_fail(self):
+    def test_movie_update_auth_fail(self):
         """Test failed updating of a movie when unauthorized."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
@@ -181,7 +181,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "forbidden")
 
-    def test_patch_movie_success(self):
+    def test_update_movie_success(self):
         """Test successful update of a movie."""
         old_movie = Movie.query.order_by(Movie.id.desc()).first().format()
         movie_id = old_movie["id"]
@@ -208,7 +208,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         self.assertTrue(response.json.get("new_movie"))
         self.assertIsNotNone(movie)
 
-    def test_patch_movie_unrecognized_actor_fail(self):
+    def test_update_movie_unrecognized_actor_fail(self):
         """Test failed movie update when an actor doesn't exist in the db."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
         new_movie = {
@@ -234,7 +234,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "bad_request")
 
-    def test_patch_movie_out_of_range_fail(self):
+    def test_update_movie_out_of_range_fail(self):
         """Test failed movie update when movie does not exist."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
         new_movie = {
@@ -257,7 +257,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
             response.json.get("error_code"), "unprocessable_entity"
         )
 
-    def test_patch_movie_no_info_fail(self):
+    def test_update_movie_no_info_fail(self):
         """Test failed movie update when in info is given."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
@@ -514,7 +514,7 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "forbidden")
 
-    def test_actor_patch_auth_fail(self):
+    def test_actor_update_auth_fail(self):
         """Test failed updating of an actor when unauthorized."""
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
 
@@ -623,12 +623,12 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "bad_request")
 
-    def test_patch_actor_success(self):
+    def test_update_actor_success(self):
         """Test successful update of an actor."""
         old_actor = Actor.query.order_by(Actor.id.desc()).first().format()
         actor_id = old_actor["id"]
         new_actor = {
-            "name": "Tom Hiddleston	",
+            "name": "Tom Hiddleston",
             "birthdate": "1981-02-09",
             "gender": "male",
             "image": (
@@ -655,7 +655,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         self.assertTrue(response.json.get("new_actor"))
         self.assertIsNotNone(actor)
 
-    def test_patch_actor_unrecognized_actor_fail(self):
+    def test_update_actor_unrecognized_movie_fail(self):
         """Test failed actor update when a movie doesn't exist in the db."""
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
         new_actor = {
@@ -684,7 +684,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "bad_request")
 
-    def test_patch_actor_out_of_range_fail(self):
+    def test_update_actor_out_of_range_fail(self):
         """Test failed actor update when actor does not exist."""
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
         new_actor = {
@@ -712,7 +712,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
             response.json.get("error_code"), "unprocessable_entity"
         )
 
-    def test_patch_actor_no_info_fail(self):
+    def test_update_actor_no_info_fail(self):
         """Test failed actor update when in info is given."""
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
 

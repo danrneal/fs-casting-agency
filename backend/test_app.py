@@ -265,6 +265,18 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "bad_request")
 
+    def test_delete_movie_auth_fail(self):
+        """Test failed movie deletion when unauthorized."""
+        movie_id = Movie.query.order_by(Movie.id.desc()).first().id
+
+        response = self.client().delete(
+            f"/movies/{movie_id}", headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "forbidden")
+
 
 class ExecutiveProducerMovieTestCase(unittest.TestCase):
     """Contains the test cases for the executive producer movie endpoints.
@@ -348,6 +360,38 @@ class ExecutiveProducerMovieTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "bad_request")
+
+    def test_delete_movie_success(self):
+        """Test successful deletion of movie."""
+        old_movie = Movie.query.order_by(Movie.id.desc()).first().format()
+        movie_id = old_movie["id"]
+
+        response = self.client().delete(
+            f"/movies/{movie_id}", headers=self.headers
+        )
+
+        movie = Movie.query.get(movie_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json.get("success"), True)
+        self.assertEqual(response.json.get("deleted_movie_id"), movie_id)
+        self.assertEqual(response.json.get("old_movie"), old_movie)
+        self.assertIsNone(response.json.get("new_movie"))
+        self.assertIsNone(movie)
+
+    def test_delete_movie_out_of_range_fail(self):
+        """Test failed movie deletion when movie does not exist."""
+        movie_id = Movie.query.order_by(Movie.id.desc()).first().id
+
+        response = self.client().delete(
+            f"/movies/{movie_id+1}", headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(
+            response.json.get("error_code"), "unprocessable_entity"
+        )
 
 
 if __name__ == "__main__":

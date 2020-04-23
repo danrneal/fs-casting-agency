@@ -142,13 +142,13 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
         """Test failed updating of a movie when unauthorized."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
-        response = self.client().patch(f"/movies/{movie_id}")
-
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.json.get("success"), False)
-        self.assertEqual(
-            response.json.get("error_code"), "authorization_header_missing"
+        response = self.client().patch(
+            f"/movies/{movie_id}", headers=self.headers
         )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "forbidden")
 
 
 class CastingDirectorMovieTestCase(unittest.TestCase):

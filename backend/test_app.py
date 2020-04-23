@@ -9,15 +9,20 @@ Attributes:
         token belonging to a user with the 'Executive Producer' role
 
 Classes:
+    PublicMovieTestCase()
     CastingAssistantMovieTestCase()
     CastingDirectorMovieTestCase()
     ExecutiveProducerMovieTestCase()
+    PublicActorTestCase()
+    CastingAssistantActorTestCase()
+    CastingDirectorActorTestCase()
+    ExecutiveProducerActorTestCase()
 """
 
 import os
 import unittest
-from app import app, MOVIES_PER_PAGE
-from models import setup_db, Movie
+from app import app, MOVIES_PER_PAGE, ACTORS_PER_PAGE
+from models import setup_db, Movie, Actor
 
 TEST_DATABASE_URL = os.environ["TEST_DATABASE_URL"]
 CASTING_ASSISTANT_TOKEN = os.environ["CASTING_ASSISTANT_TOKEN"]
@@ -392,6 +397,99 @@ class ExecutiveProducerMovieTestCase(unittest.TestCase):
         self.assertEqual(
             response.json.get("error_code"), "unprocessable_entity"
         )
+
+
+class PublicActorTestCase(unittest.TestCase):
+    """Contains the test cases for the public actor endpoints.
+
+    Attributes:
+        app: A flask app from app.py
+        client: A test client for the flask app to use while testing
+        database_url: A str representing the location of the db used for
+            testing
+    """
+
+    def setUp(self):
+        """Set-up for PublicActorTestCase."""
+        self.app = app
+        app.config["DEBUG"] = False
+        self.client = self.app.test_client
+        self.database_url = TEST_DATABASE_URL
+        setup_db(self.app, self.database_url)
+
+    def tearDown(self):
+        """Executed after each test."""
+
+    def test_get_paginated_actors_auth_fail(self):
+        """Test failed retrieval of actors when not authenticated."""
+        response = self.client().get("/actors")
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(
+            response.json.get("error_code"), "authorization_header_missing"
+        )
+
+    def test_actors_patch_method_not_allowed_fail(self):
+        """Test that patch method is not allowed at /actors endpoint."""
+        response = self.client().patch("/actors")
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "method_not_allowed")
+
+    def test_actors_delete_method_not_allowed_fail(self):
+        """Test that delete method is not allowed at /actors endpoint."""
+        response = self.client().delete("/actors")
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "method_not_allowed")
+
+
+class CastingAssistantActorTestCase(unittest.TestCase):
+    """Contains the test cases for the casting assistant actor endpoints.
+
+    Attributes:
+        headers: A dict representing the auth headers to be sent with requests
+        app: A flask app from app.py
+        client: A test client for the flask app to use while testing
+        database_url: A str representing the location of the db used for
+            testing
+    """
+
+    def setUp(self):
+        """Set-up for CastingAssistantActorTestCase."""
+        self.headers = {"Authorization": f"Bearer {CASTING_ASSISTANT_TOKEN}"}
+        self.app = app
+        app.config["DEBUG"] = False
+        self.client = self.app.test_client
+        self.database_url = TEST_DATABASE_URL
+        setup_db(self.app, self.database_url)
+
+    def tearDown(self):
+        """Executed after each test."""
+
+    def test_get_paginated_actors_success(self):
+        """Test successful retrieval of actors."""
+        response = self.client().get("/actors", headers=self.headers)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json.get("success"), True)
+        self.assertEqual(len(response.json.get("actors")), ACTORS_PER_PAGE)
+        self.assertGreater(response.json.get("total_actors"), ACTORS_PER_PAGE)
+
+    def test_get_paginated_actors_out_of_range_fail(self):
+        """Test failed actor retrieval when page number is out of range."""
+        total_pages = -(-Actor.query.count() // ACTORS_PER_PAGE)
+
+        response = self.client().get(
+            f"/actors?page={total_pages+1}", headers=self.headers
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "not_found")
 
 
 if __name__ == "__main__":

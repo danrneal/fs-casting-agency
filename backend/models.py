@@ -59,7 +59,7 @@ class Movie(db.Model):
     title = Column(String)
     release_date = Column(Date)
     poster = Column(String)
-    actors = relationship("Actor", secondary=movie_actors, backref="movie")
+    actors = relationship("Actor", secondary=movie_actors, backref="movies")
 
     def insert(self):
         """Inserts a new movie object into the db."""

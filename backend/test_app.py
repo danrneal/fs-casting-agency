@@ -446,6 +446,22 @@ class PublicActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "method_not_allowed")
 
+    def test_actor_get_method_not_allowed_fail(self):
+        """Test that get method is not allowed at /actors/id endpoint."""
+        response = self.client().get("/actors/1")
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "method_not_allowed")
+
+    def test_actors_post_method_not_allowed_fail(self):
+        """Test that post method is not allowed at /actors/id endpoint."""
+        response = self.client().post("/actors/1")
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json.get("success"), False)
+        self.assertEqual(response.json.get("error_code"), "method_not_allowed")
+
 
 class CastingAssistantActorTestCase(unittest.TestCase):
     """Contains the test cases for the casting assistant actor endpoints.

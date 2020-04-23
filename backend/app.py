@@ -35,6 +35,30 @@ def get_actors_from_names(actor_names):
     return actors
 
 
+def get_movies_from_titles(movie_titles):
+    """Gets a list of movie objects from a list of movie titles.
+
+    Args:
+        movie_titles: A list of strs representing the titles of movies
+
+    Returns:
+        movies: A list of movie objects corresponding to the movie titles
+            passed in
+    """
+    movies = []
+
+    if movie_titles is not None:
+        for movie_title in movie_titles:
+            movie = Movie.query.filter_by(title=movie_title).first()
+
+            if movie is None:
+                raise AttributeError
+
+            movies.append(movie)
+
+    return movies
+
+
 @app.after_request
 def after_request(response):
     """Adds response headers after request.
@@ -224,6 +248,41 @@ def get_actors():
             "total_actors": len(actors),
         }
     )
+
+    return response
+
+
+@app.route("/actors", methods=["POST"])
+@requires_auth("create:actors")
+def create_actor():
+    """Route handler for the endpoint for creating a new actor.
+
+    Returns:
+        response: A json object representing info about the created actor
+    """
+    try:
+
+        actor = Actor(
+            name=request.json.get("name"),
+            birthdate=request.json.get("birthdate"),
+            gender=request.json.get("gender"),
+            image=request.json.get("image"),
+            movies=get_movies_from_titles(request.json.get("movies")),
+        )
+
+        actor.insert()
+
+        response = jsonify(
+            {
+                "success": True,
+                "created_actor_id": actor.id,
+                "old_actor": None,
+                "new_actor": actor.format(),
+            }
+        )
+
+    except AttributeError:
+        abort(400)
 
     return response
 

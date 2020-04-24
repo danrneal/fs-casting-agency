@@ -21,8 +21,7 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-MOVIES_PER_PAGE = 25
-ACTORS_PER_PAGE = 25
+ITEMS_PER_PAGE = 25
 
 
 def get_actors_from_names(actor_names):
@@ -131,10 +130,8 @@ def get_movies():
         response: A json object representing a page of movies
     """
     page = request.args.get("page", 1, type=int)
-    start = (page - 1) * MOVIES_PER_PAGE
-    end = start + MOVIES_PER_PAGE
-    movies = Movie.query.order_by(Movie.title).all()
-    current_movies = [movie.format() for movie in movies][start:end]
+    movies = Movie.query.order_by(Movie.title).paginate(page, ITEMS_PER_PAGE)
+    current_movies = [movie.format() for movie in movies.items]
 
     if len(current_movies) == 0:
         abort(404)
@@ -143,7 +140,7 @@ def get_movies():
         {
             "success": True,
             "movies": current_movies,
-            "total_movies": len(movies),
+            "total_movies": movies.total,
         }
     )
 
@@ -276,10 +273,8 @@ def get_actors():
         response: A json object representing a page of actors
     """
     page = request.args.get("page", 1, type=int)
-    start = (page - 1) * ACTORS_PER_PAGE
-    end = start + ACTORS_PER_PAGE
-    actors = Actor.query.order_by(Actor.name).all()
-    current_actors = [actor.format() for actor in actors][start:end]
+    actors = Actor.query.order_by(Actor.name).paginate(page, ITEMS_PER_PAGE)
+    current_actors = [actor.format() for actor in actors.items]
 
     if len(current_actors) == 0:
         abort(404)
@@ -288,7 +283,7 @@ def get_actors():
         {
             "success": True,
             "actors": current_actors,
-            "total_actors": len(actors),
+            "total_actors": actors.total,
         }
     )
 

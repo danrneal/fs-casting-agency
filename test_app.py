@@ -20,7 +20,7 @@ Classes:
 
 import os
 import unittest
-from app import app, MOVIES_PER_PAGE, ACTORS_PER_PAGE
+from app import app, ITEMS_PER_PAGE
 from models import setup_db, Movie, Actor
 
 TEST_DATABASE_URL = os.environ["TEST_DATABASE_URL"]
@@ -122,12 +122,12 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json.get("success"), True)
-        self.assertEqual(len(response.json.get("movies")), MOVIES_PER_PAGE)
-        self.assertGreater(response.json.get("total_movies"), MOVIES_PER_PAGE)
+        self.assertEqual(len(response.json.get("movies")), ITEMS_PER_PAGE)
+        self.assertGreater(response.json.get("total_movies"), ITEMS_PER_PAGE)
 
     def test_get_paginated_movies_out_of_range_fail(self):
         """Test failed movie retrieval when page number is out of range."""
-        total_pages = -(-Movie.query.count() // MOVIES_PER_PAGE)
+        total_pages = -(-Movie.query.count() // ITEMS_PER_PAGE)
 
         response = self.client().get(
             f"/movies?page={total_pages+1}", headers=self.headers
@@ -491,12 +491,12 @@ class CastingAssistantActorTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json.get("success"), True)
-        self.assertEqual(len(response.json.get("actors")), ACTORS_PER_PAGE)
-        self.assertGreater(response.json.get("total_actors"), ACTORS_PER_PAGE)
+        self.assertEqual(len(response.json.get("actors")), ITEMS_PER_PAGE)
+        self.assertGreater(response.json.get("total_actors"), ITEMS_PER_PAGE)
 
     def test_get_paginated_actors_out_of_range_fail(self):
         """Test failed actor retrieval when page number is out of range."""
-        total_pages = -(-Actor.query.count() // ACTORS_PER_PAGE)
+        total_pages = -(-Actor.query.count() // ITEMS_PER_PAGE)
 
         response = self.client().get(
             f"/actors?page={total_pages+1}", headers=self.headers

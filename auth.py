@@ -18,7 +18,6 @@ from jose import jwt
 from six.moves.urllib.request import urlopen
 
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
-CLIENT_ID = os.environ["CLIENT_ID"]
 ALGORITHMS = ["RS256"]
 API_IDENTIFIER = os.environ["API_IDENTIFIER"]
 

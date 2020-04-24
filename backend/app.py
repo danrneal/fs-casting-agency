@@ -6,9 +6,15 @@ Attributes:
     app: A flask Flask object creating the flask app
 """
 
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, render_template
 from flask_cors import CORS
-from auth import requires_auth, AuthError
+from auth import (
+    requires_auth,
+    AuthError,
+    AUTH0_DOMAIN,
+    CLIENT_ID,
+    API_IDENTIFIER,
+)
 from models import setup_db, Movie, Actor
 
 app = Flask(__name__)
@@ -82,6 +88,35 @@ def after_request(response):
     )
     response.headers.add(
         "Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS"
+    )
+
+    return response
+
+
+@app.route("/")
+def index():
+    """Route handler for the homepage.
+
+    Returns:
+        Template for the homepage
+    """
+    return render_template("index.html")
+
+
+@app.route("/auth_config")
+def auth_config():
+    """Route handler for auth config variables.
+
+    Returns:
+        response: A json object representing the Auth0 Domain and Client ID of
+            the Auth0 application
+    """
+    response = jsonify(
+        {
+            "domain": AUTH0_DOMAIN,
+            "client_id": CLIENT_ID,
+            "audience": API_IDENTIFIER,
+        }
     )
 
     return response

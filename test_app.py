@@ -1,5 +1,7 @@
 """Test objects used to test the behavior of endpoints in app.py.
 
+Usage: test_app.py
+
 Attributes:
     CASTING_ASSISTANT_TOKEN: An environmental variable representing a valid
         token belonging to a user with the 'Casting Assistant' role

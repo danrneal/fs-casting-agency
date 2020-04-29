@@ -139,7 +139,7 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "not_found")
 
-    def test_movie_update_auth_fail(self):
+    def test_update_movie_auth_fail(self):
         """Test failed updating of a movie when unauthorized."""
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
@@ -516,7 +516,7 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         self.assertEqual(response.json.get("success"), False)
         self.assertEqual(response.json.get("error_code"), "forbidden")
 
-    def test_actor_update_auth_fail(self):
+    def test_update_actor_auth_fail(self):
         """Test failed updating of an actor when unauthorized."""
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
 

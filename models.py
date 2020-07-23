@@ -12,8 +12,9 @@ Classes:
 """
 
 import os
+
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Integer, Date, ForeignKey
+from sqlalchemy import Column, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 DATABASE_URL = os.environ["DATABASE_URL"]

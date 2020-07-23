@@ -10,9 +10,10 @@ Classes:
     AuthError()
 """
 
+import json
 import os
 from functools import wraps
-import json
+
 from flask import request
 from jose import jwt
 from six.moves.urllib.request import urlopen

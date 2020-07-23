@@ -22,8 +22,9 @@ Classes:
 
 import os
 import unittest
-from app import app, ITEMS_PER_PAGE
-from models import setup_db, Movie, Actor
+
+from app import ITEMS_PER_PAGE, app
+from models import Actor, Movie, setup_db
 
 TEST_DATABASE_URL = os.environ["TEST_DATABASE_URL"]
 CASTING_ASSISTANT_TOKEN = os.environ["CASTING_ASSISTANT_TOKEN"]

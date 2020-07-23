@@ -67,7 +67,8 @@ class Movie(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def update(self):
+    @staticmethod
+    def update():
         """Updates an existing movie object in the db."""
         db.session.commit()
 
@@ -119,7 +120,8 @@ class Actor(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def update(self):
+    @staticmethod
+    def update():
         """Updates an existing actor object in the db."""
         db.session.commit()
 

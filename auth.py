@@ -65,7 +65,7 @@ def get_token_auth_header():
             },
             401,
         )
-    elif len(parts) == 1:
+    if len(parts) == 1:
         raise AuthError(
             {
                 "error_code": "invalid_header",
@@ -73,7 +73,7 @@ def get_token_auth_header():
             },
             401,
         )
-    elif len(parts) > 2:
+    if len(parts) > 2:
         raise AuthError(
             {
                 "error_code": "invalid_header",

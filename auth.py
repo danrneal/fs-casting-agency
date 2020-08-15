@@ -1,6 +1,7 @@
 """Logic for authenticating users and verifying permissions for a request.
 
 Attributes:
+    AUTH0_CLIENT_ID: A str representing the client ID for the Auth0 app
     AUTH0_DOMAIN: A str representing the domain for the Auth0 app
     ALGORITHMS: A list representing the accepted encryption algorithms for the
         access token
@@ -18,6 +19,7 @@ from flask import request
 from jose import jwt
 from six.moves.urllib.request import urlopen
 
+AUTH0_CLIENT_ID = os.environ["AUTH0_CLIENT_ID"]
 AUTH0_DOMAIN = os.environ["AUTH0_DOMAIN"]
 ALGORITHMS = ["RS256"]
 API_IDENTIFIER = os.environ["API_IDENTIFIER"]

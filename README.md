@@ -32,6 +32,7 @@ Set up your environment variables:
 ```bash
 touch .env
 echo AUTH0_DOMAIN="XXX.auth0.com" >> .env
+echo AUTH0_CLIENT="XXX" >> .env
 echo API_IDENTIFIER="XXX" >> .env
 echo DATABASE_URL="postgresql://XXX:5432/movies" >> .env
 ```

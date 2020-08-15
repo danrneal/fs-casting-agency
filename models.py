@@ -86,7 +86,11 @@ class Movie(db.Model):
         movie = {
             "id": self.id,
             "title": self.title,
-            "release_date": str(self.release_date),
+            "release_date": (
+                str(self.release_date)
+                if self.release_date is not None
+                else None
+            ),
             "poster": self.poster,
             "actors": [
                 {"id": actor.id, "name": actor.name} for actor in self.actors
@@ -139,14 +143,20 @@ class Actor(db.Model):
         actor = {
             "id": self.id,
             "name": self.name,
-            "birthdate": str(self.birthdate),
+            "birthdate": (
+                str(self.birthdate) if self.birthdate is not None else None
+            ),
             "gender": self.gender,
             "image": self.image,
             "movies": [
                 {
                     "id": movie.id,
                     "title": movie.title,
-                    "release_date": str(movie.release_date),
+                    "release_date": (
+                        str(movie.release_date)
+                        if movie.release_date is not None
+                        else None
+                    ),
                 }
                 for movie in self.movies
             ],

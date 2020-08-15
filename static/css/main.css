@@ -1,0 +1,49 @@
+ul {
+  list-style-type: none;
+}
+
+.card {
+  width: 200px;
+}
+
+.card img {
+  display: block;
+  width: 150px;
+}
+
+.form-control.no-validate:valid {
+  border-color: transparent;
+  background-image: none;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal img {
+  width: 100px;
+}
+
+.modal .btn {
+  width: 102px;
+}
+
+.toast {
+  position: absolute;
+  top: 80px;
+  right: 16px;
+  width: 250px;
+}
+
+.toast,
+.toast-header {
+  background-color: #5c6977;
+}
+
+.toast-header {
+  border-bottom: 1px solid #868e96;
+}
+
+#content {
+  max-width: 1200px;
+}

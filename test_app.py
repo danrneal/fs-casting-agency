@@ -55,7 +55,7 @@ class PublicMovieTestCase(unittest.TestCase):
 
     def test_get_paginated_movies_auth_fail(self):
         """Test failed retrieval of movies when not authenticated."""
-        response = self.client().get("/movies")
+        response = self.client().get("/api/movies")
 
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json.get("success"), False)
@@ -65,7 +65,7 @@ class PublicMovieTestCase(unittest.TestCase):
 
     def test_movies_patch_method_not_allowed_fail(self):
         """Test that patch method is not allowed at /movies endpoint."""
-        response = self.client().patch("/movies")
+        response = self.client().patch("/api/movies")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -73,7 +73,7 @@ class PublicMovieTestCase(unittest.TestCase):
 
     def test_movies_delete_method_not_allowed_fail(self):
         """Test that delete method is not allowed at /movies endpoint."""
-        response = self.client().delete("/movies")
+        response = self.client().delete("/api/movies")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -81,7 +81,7 @@ class PublicMovieTestCase(unittest.TestCase):
 
     def test_movie_get_method_not_allowed_fail(self):
         """Test that get method is not allowed at /movies/id endpoint."""
-        response = self.client().get("/movies/1")
+        response = self.client().get("/api/movies/1")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -89,7 +89,7 @@ class PublicMovieTestCase(unittest.TestCase):
 
     def test_movie_post_method_not_allowed_fail(self):
         """Test that post method is not allowed at /movies/id endpoint."""
-        response = self.client().post("/movies/1")
+        response = self.client().post("/api/movies/1")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -121,7 +121,7 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
 
     def test_get_paginated_movies_success(self):
         """Test successful retrieval of movies."""
-        response = self.client().get("/movies", headers=self.headers)
+        response = self.client().get("/api/movies", headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json.get("success"), True)
@@ -133,7 +133,7 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
         total_pages = -(-Movie.query.count() // ITEMS_PER_PAGE)
 
         response = self.client().get(
-            f"/movies?page={total_pages+1}", headers=self.headers
+            f"/api/movies?page={total_pages+1}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 404)
@@ -145,7 +145,7 @@ class CastingAssistantMovieTestCase(unittest.TestCase):
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
         response = self.client().patch(
-            f"/movies/{movie_id}", headers=self.headers
+            f"/api/movies/{movie_id}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 403)
@@ -178,7 +178,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
 
     def test_create_movie_auth_fail(self):
         """Test failed movie creation when unauthorized."""
-        response = self.client().post("/movies", headers=self.headers)
+        response = self.client().post("/api/movies", headers=self.headers)
 
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json.get("success"), False)
@@ -199,7 +199,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         }
 
         response = self.client().patch(
-            f"/movies/{movie_id}", json=new_movie, headers=self.headers
+            f"/api/movies/{movie_id}", json=new_movie, headers=self.headers
         )
 
         movie = Movie.query.get(movie_id)
@@ -230,7 +230,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         }
 
         response = self.client().patch(
-            f"/movies/{movie_id}", json=new_movie, headers=self.headers
+            f"/api/movies/{movie_id}", json=new_movie, headers=self.headers
         )
 
         self.assertEqual(response.status_code, 400)
@@ -251,7 +251,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         }
 
         response = self.client().patch(
-            f"/movies/{movie_id+1}", json=new_movie, headers=self.headers
+            f"/api/movies/{movie_id+1}", json=new_movie, headers=self.headers
         )
 
         self.assertEqual(response.status_code, 422)
@@ -265,7 +265,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
         response = self.client().patch(
-            f"/movies/{movie_id}", headers=self.headers
+            f"/api/movies/{movie_id}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 400)
@@ -277,7 +277,7 @@ class CastingDirectorMovieTestCase(unittest.TestCase):
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
         response = self.client().delete(
-            f"/movies/{movie_id}", headers=self.headers
+            f"/api/movies/{movie_id}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 403)
@@ -322,7 +322,7 @@ class ExecutiveProducerMovieTestCase(unittest.TestCase):
         }
 
         response = self.client().post(
-            "/movies", json=new_movie, headers=self.headers
+            "/api/movies", json=new_movie, headers=self.headers
         )
 
         created_movie_id = response.json.get("created_movie_id")
@@ -353,7 +353,7 @@ class ExecutiveProducerMovieTestCase(unittest.TestCase):
         }
 
         response = self.client().post(
-            "/movies", json=new_movie, headers=self.headers
+            "/api/movies", json=new_movie, headers=self.headers
         )
 
         self.assertEqual(response.status_code, 400)
@@ -362,7 +362,7 @@ class ExecutiveProducerMovieTestCase(unittest.TestCase):
 
     def test_create_movie_no_info_fail(self):
         """Test failed movie creation when info is missing."""
-        response = self.client().post("/movies", headers=self.headers)
+        response = self.client().post("/api/movies", headers=self.headers)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json.get("success"), False)
@@ -374,7 +374,7 @@ class ExecutiveProducerMovieTestCase(unittest.TestCase):
         movie_id = old_movie["id"]
 
         response = self.client().delete(
-            f"/movies/{movie_id}", headers=self.headers
+            f"/api/movies/{movie_id}", headers=self.headers
         )
 
         movie = Movie.query.get(movie_id)
@@ -391,7 +391,7 @@ class ExecutiveProducerMovieTestCase(unittest.TestCase):
         movie_id = Movie.query.order_by(Movie.id.desc()).first().id
 
         response = self.client().delete(
-            f"/movies/{movie_id+1}", headers=self.headers
+            f"/api/movies/{movie_id+1}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 422)
@@ -424,7 +424,7 @@ class PublicActorTestCase(unittest.TestCase):
 
     def test_get_paginated_actors_auth_fail(self):
         """Test failed retrieval of actors when not authenticated."""
-        response = self.client().get("/actors")
+        response = self.client().get("/api/actors")
 
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json.get("success"), False)
@@ -434,7 +434,7 @@ class PublicActorTestCase(unittest.TestCase):
 
     def test_actors_patch_method_not_allowed_fail(self):
         """Test that patch method is not allowed at /actors endpoint."""
-        response = self.client().patch("/actors")
+        response = self.client().patch("/api/actors")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -442,7 +442,7 @@ class PublicActorTestCase(unittest.TestCase):
 
     def test_actors_delete_method_not_allowed_fail(self):
         """Test that delete method is not allowed at /actors endpoint."""
-        response = self.client().delete("/actors")
+        response = self.client().delete("/api/actors")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -450,7 +450,7 @@ class PublicActorTestCase(unittest.TestCase):
 
     def test_actor_get_method_not_allowed_fail(self):
         """Test that get method is not allowed at /actors/id endpoint."""
-        response = self.client().get("/actors/1")
+        response = self.client().get("/api/actors/1")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -458,7 +458,7 @@ class PublicActorTestCase(unittest.TestCase):
 
     def test_actors_post_method_not_allowed_fail(self):
         """Test that post method is not allowed at /actors/id endpoint."""
-        response = self.client().post("/actors/1")
+        response = self.client().post("/api/actors/1")
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json.get("success"), False)
@@ -490,7 +490,7 @@ class CastingAssistantActorTestCase(unittest.TestCase):
 
     def test_get_paginated_actors_success(self):
         """Test successful retrieval of actors."""
-        response = self.client().get("/actors", headers=self.headers)
+        response = self.client().get("/api/actors", headers=self.headers)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json.get("success"), True)
@@ -502,7 +502,7 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         total_pages = -(-Actor.query.count() // ITEMS_PER_PAGE)
 
         response = self.client().get(
-            f"/actors?page={total_pages+1}", headers=self.headers
+            f"/api/actors?page={total_pages+1}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 404)
@@ -511,7 +511,7 @@ class CastingAssistantActorTestCase(unittest.TestCase):
 
     def test_create_actor_auth_fail(self):
         """Test failed actor creation when unauthorized."""
-        response = self.client().post("/actors", headers=self.headers)
+        response = self.client().post("/api/actors", headers=self.headers)
 
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json.get("success"), False)
@@ -522,7 +522,7 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
 
         response = self.client().patch(
-            f"/actors/{actor_id}", headers=self.headers
+            f"/api/actors/{actor_id}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 403)
@@ -534,7 +534,7 @@ class CastingAssistantActorTestCase(unittest.TestCase):
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
 
         response = self.client().delete(
-            f"/actors/{actor_id}", headers=self.headers
+            f"/api/actors/{actor_id}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 403)
@@ -579,7 +579,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         }
 
         response = self.client().post(
-            "/actors", json=new_actor, headers=self.headers
+            "/api/actors", json=new_actor, headers=self.headers
         )
 
         created_actor_id = response.json.get("created_actor_id")
@@ -611,7 +611,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         }
 
         response = self.client().post(
-            "/actors", json=new_actor, headers=self.headers
+            "/api/actors", json=new_actor, headers=self.headers
         )
 
         self.assertEqual(response.status_code, 400)
@@ -620,7 +620,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
 
     def test_create_actor_no_info_fail(self):
         """Test failed actor creation when info is missing."""
-        response = self.client().post("/actors", headers=self.headers)
+        response = self.client().post("/api/actors", headers=self.headers)
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json.get("success"), False)
@@ -646,7 +646,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         }
 
         response = self.client().patch(
-            f"/actors/{actor_id}", json=new_actor, headers=self.headers
+            f"/api/actors/{actor_id}", json=new_actor, headers=self.headers
         )
 
         actor = Actor.query.get(actor_id)
@@ -680,7 +680,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         }
 
         response = self.client().patch(
-            f"/actors/{actor_id}", json=new_actor, headers=self.headers
+            f"/api/actors/{actor_id}", json=new_actor, headers=self.headers
         )
 
         self.assertEqual(response.status_code, 400)
@@ -706,7 +706,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         }
 
         response = self.client().patch(
-            f"/actors/{actor_id+1}", json=new_actor, headers=self.headers
+            f"/api/actors/{actor_id+1}", json=new_actor, headers=self.headers
         )
 
         self.assertEqual(response.status_code, 422)
@@ -720,7 +720,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
 
         response = self.client().patch(
-            f"/actors/{actor_id}", headers=self.headers
+            f"/api/actors/{actor_id}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 400)
@@ -733,7 +733,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         actor_id = old_actor["id"]
 
         response = self.client().delete(
-            f"/actors/{actor_id}", headers=self.headers
+            f"/api/actors/{actor_id}", headers=self.headers
         )
 
         actor = Actor.query.get(actor_id)
@@ -750,7 +750,7 @@ class CastingDirectorActorTestCase(unittest.TestCase):
         actor_id = Actor.query.order_by(Actor.id.desc()).first().id
 
         response = self.client().delete(
-            f"/actors/{actor_id+1}", headers=self.headers
+            f"/api/actors/{actor_id+1}", headers=self.headers
         )
 
         self.assertEqual(response.status_code, 422)

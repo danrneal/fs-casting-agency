@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Casting Agency</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/superhero/bootstrap.min.css"
+      integrity="sha384-rvwYMW9Z/bbxZfgxHQEKx6D91KwffWAG+XnsoYNCGWi/qL1P9dIVYm1HBiHFqQEt"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
+    <script id="movie" type="text/x-handlebars-template">
+      {% raw %}
+      <div class='card border-primary m-3'>
+        <img class='mx-auto my-4' src="{{poster}}" alt="{{title}} poster" />
+        <div class='col w-100 align-self-end p-0'>
+          <div class='card-footer row m-0 w-100 h-100'>
+            <div class='align-self-center text-center w-100'>
+              {{#if title}}
+                <div>
+                  {{title}}
+                </div>
+              {{/if}}
+              {{#if year}}
+                <div>
+                  ({{year}})
+                </div>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endraw %}
+    </script>
+
+    <script id="actor" type="text/x-handlebars-template">
+      {% raw %}
+      <div class='card border-primary m-3'>
+        <img class='mx-auto my-4' src="{{image}}" alt="{{name}} image" />
+        <div class='col w-100 align-self-end p-0'>
+          <div class='card-footer row m-0 w-100 h-100'>
+            <div class='align-self-center text-center w-100'>
+              {{#if name}}
+                <div>
+                  {{name}}
+                </div>
+              {{/if}}
+              <div>
+                {{#if gender}}
+                  {{gender}}{{#if age}}
+                    :
+                  {{/if}}
+                {{/if}}
+                {{#if age}}
+                  {{age}} years old
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endraw %}
+    </script>
+
+    <script id="movie-modal" type="text/x-handlebars-template">
+      {% raw %}
+      <div class='modal-header text-center'>
+        <h5 class='modal-title w-100 ml-4' id='modalLabel'>
+          {{title}}
+        </h5>
+        <button type='button' class='close float-right' data-dismiss='modal'>
+          <span>
+            &times;
+          </span>
+        </button>
+      </div>
+
+      <div class='modal-body row'>
+        <div class='col-3'>
+          <img src="{{poster}}" alt="{{title}} poster" />
+        </div>
+        <div class='col-9 w-100'>
+          <div class='row m-2'>
+            <div class='text-right col-4 p-0'>
+              Release Date:
+            </div>
+            <div class='col-8'>
+              {{releaseDate}}
+            </div>
+          </div>
+          <div class='row m-2'>
+            <div class='text-right col-4 p-0'>
+              Actors:
+            </div>
+            <div class='col-8'>
+              <ul class='p-0'>
+                {{#each actors}}
+                  <li>
+                    {{this.name}}
+                  </li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class='modal-footer py-0'>
+        <div class='text-center m-0 w-100'>
+          <button id='edit-btn' class='btn btn-info my-3 mx-2 hidden'>
+            ✎ EDIT
+          </button>
+          <button id='delete-btn' class='btn btn-danger my-3 mx-2 hidden'>
+            ✘ DELETE
+          </button>
+        </div>
+      </div>
+      {% endraw %}
+    </script>
+
+    <script id="actor-modal" type="text/x-handlebars-template">
+      {% raw %}
+      <div class='modal-header text-center'>
+        <h5 class='modal-title w-100 ml-4' id='modalLabel'>
+          {{name}}
+        </h5>
+        <button type='button' class='close float-right' data-dismiss='modal'>
+          <span>
+            &times;
+          </span>
+        </button>
+      </div>
+
+      <div class='modal-body row'>
+        <div class='col-3'>
+          <img src="{{image}}" alt="{{name}} image" />
+        </div>
+        <div class='col-9 w-100'>
+          <div class='row m-2'>
+            <div class='text-right col-4 p-0'>
+              Birthdate:
+            </div>
+            <div class='col-8'>
+              {{birthdate}}
+            </div>
+          </div>
+          <div class='row m-2'>
+            <div class='text-right col-4 p-0'>
+              Gender:
+            </div>
+            <div class='col-8'>
+              {{gender}}
+            </div>
+          </div>
+          <div class='row m-2'>
+            <div class='text-right col-4 p-0'>
+              Movies:
+            </div>
+            <div class='col-8'>
+              <ul class='p-0'>
+                {{#each movies}}
+                  <li>
+                    {{this.title}}
+                  </li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class='modal-footer py-0'>
+        <div class='text-center m-0 w-100'>
+          <button id='edit-btn' class='btn btn-info my-3 mx-2 hidden'>
+            ✎ EDIT
+          </button>
+          <button id='delete-btn' class='btn btn-danger my-3 mx-2 hidden'>
+            ✘ DELETE
+          </button>
+        </div>
+      </div>
+      {% endraw %}
+    </script>
+
+    <script id="movie-form" type="text/x-handlebars-template">
+      {% raw %}
+      <div class='modal-header'>
+        <h5 class='modal-title' id='modalLabel'>
+          {{header}}
+        </h5>
+        <button type='button' class='close' data-dismiss='modal'>
+          <span>
+            &times;
+          </span>
+        </button>
+      </div>
+
+      <form class='needs-validation' novalidate>
+        <div class='modal-body'>
+          <div class='form-group'>
+            <label for='title'>
+              Title
+            </label>
+            <input
+              id='title'
+              class='form-control'
+              type='text'
+              name='title'
+              placeholder='Title'
+              value="{{title}}"
+            />
+          </div>
+          <div class='form-group'>
+            <label for='release-date'>
+              Release Date
+            </label>
+            <input
+              id='release-date'
+              class='form-control'
+              type='text'
+              name='releaseDate'
+              placeholder='yyyy-mm-dd'
+              pattern='^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+              value="{{releaseDate}}"
+            />
+            <div class='invalid-feedback'>
+              Please specify a date in the yyyy-mm-dd format.
+            </div>
+          </div>
+          <div class='form-group'>
+            <label for='actors'>
+              Actors
+            </label>
+            <textarea
+              class='form-control no-validate'
+              id='actors'
+              name='actors'
+              rows='4'
+            >
+              {{actors}}
+            </textarea>
+            <div class='invalid-feedback'>
+              Unrecognized actors(s).
+            </div>
+          </div>
+          <div class='form-group'>
+            <label for='poster'>
+              Poster
+            </label>
+            <input
+              id='poster'
+              class='form-control'
+              type='text'
+              name='poster'
+              placeholder='https://'
+              pattern='^https?:\/\/.+'
+              value="{{poster}}"
+            />
+            <div class='invalid-feedback'>
+              Please enter a valid url.
+            </div>
+          </div>
+        </div>
+
+        <div class='modal-footer py-0'>
+          <div class='text-center m-0 w-100'>
+            <input
+              id='save-btn'
+              type='submit'
+              class='btn btn-info m-3'
+              name='save'
+              value='✔ SAVE'
+            />
+          </div>
+        </div>
+      </form>
+
+      {% endraw %}
+    </script>
+
+    <script id="actor-form" type="text/x-handlebars-template">
+      {% raw %}
+      <div class='modal-header'>
+        <h5 class='modal-title' id='modalLabel'>
+          {{header}}
+        </h5>
+        <button type='button' class='close' data-dismiss='modal'>
+          <span>
+            &times;
+          </span>
+        </button>
+      </div>
+
+      <form class='needs-validation' novalidate>
+        <div class='modal-body'>
+          <div class='form-group'>
+            <label for='name'>
+              Name
+            </label>
+            <input
+              id='name'
+              class='form-control'
+              type='text'
+              name='name'
+              placeholder='Name'
+              value="{{name}}"
+            />
+          </div>
+          <div class='form-group'>
+            <label for='birthdate'>
+              Birthdate
+            </label>
+            <input
+              id='birthdate'
+              class='form-control'
+              type='text'
+              name='birthdate'
+              placeholder='yyyy-mm-dd'
+              pattern='^([12]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
+              value="{{birthdate}}"
+            />
+            <div class='invalid-feedback'>
+              Please specify a date in the yyyy-mm-dd format.
+            </div>
+          </div>
+          <div class='form-group'>
+            <label for='gender'>
+              Gender
+            </label>
+            <select class='form-control' id='gender'>
+              <option disabled hidden value selected></option>
+              {{#if gender.male}}
+                <option value='male' selected>
+                  Male
+                </option>
+                <option value='female'>
+                  Female
+                </option>
+              {{else if gender.female}}
+                <option value='male'>
+                  Male
+                </option>
+                <option value='female' selected>
+                  Female
+                </option>
+              {{else}}
+                <option value='male'>
+                  Male
+                </option>
+                <option value='female'>
+                  Female
+                </option>
+              {{/if}}
+            </select>
+          </div>
+          <div class='form-group'>
+            <label for='movies'>
+              Movies
+            </label>
+            <textarea
+              class='form-control no-validate'
+              id='movies'
+              name='movies'
+              rows='4'
+            >
+              {{movies}}
+            </textarea>
+            <div class='invalid-feedback'>
+              Unrecognized movie(s).
+            </div>
+          </div>
+          <div class='form-group'>
+            <label for='image'>
+              Image
+            </label>
+            <input
+              id='image'
+              class='form-control'
+              type='text'
+              name='image'
+              placeholder='https://'
+              pattern='^https?:\/\/.+'
+              value="{{image}}"
+            />
+            <div class='invalid-feedback'>
+              Please enter a valid url.
+            </div>
+          </div>
+        </div>
+
+        <div class='modal-footer py-0'>
+          <div class='text-center m-0 w-100'>
+            <input
+              id='save-btn'
+              type='submit'
+              class='btn btn-info m-3'
+              name='save'
+              value='✔ SAVE'
+            />
+          </div>
+        </div>
+      </form>
+
+      {% endraw %}
+    </script>
+
+    <script id="pagination" type="text/x-handlebars-template">
+      {% raw %}
+      {{#if firstPage}}
+        <li class='page-item disabled' data-page='prev'>
+          <a class='page-link' href='#' tabindex='-1'>
+            Previous
+          </a>
+        </li>
+      {{/if}}
+      {{#unless firstPage}}
+        <li class='page-item' data-page='prev'>
+          <a class='page-link' href='#'>
+            Previous
+          </a>
+        </li>
+      {{/unless}}
+      {{#each pages}}
+        <li class='page-item' data-page={{this}}>
+          <a class='page-link' href='#'>
+            {{this}}
+          </a>
+        </li>
+      {{/each}}
+      {{#if lastPage}}
+        <li class='page-item disabled' data-page='next'>
+          <a class='page-link' href='#' tabindex='-1'>
+            Next
+          </a>
+        </li>
+      {{/if}}
+      {{#unless lastPage}}
+        <li class='page-item' data-page='next'>
+          <a class='page-link' href='#'>
+            Next
+          </a>
+        </li>
+      {{/unless}}
+      {% endraw %}
+    </script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-primary">
+      <a class="navbar-brand my-2" href="/">FS Casting Agency</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbar"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbar">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a id="nav-movies" class="nav-link hidden" href="#">Movies</a>
+          </li>
+          <li class="nav-item">
+            <a id="nav-actors" class="nav-link hidden" href="#">Actors</a>
+          </li>
+        </ul>
+        <div class="nav-item">
+          <span id="username" class="navbar-text px-md-3"></span>
+        </div>
+        <button id="login-btn" class="btn btn-secondary mb-2 mb-md-0 hidden">
+          Log in
+        </button>
+        <button id="logout-btn" class="btn btn-secondary mb-2 mb-md-0 hidden">
+          Log out
+        </button>
+      </div>
+    </nav>
+
+    <div class="toast" role="alert" data-delay="5000">
+      <div class="toast-header">
+        <strong class="mr-auto"></strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="toast-body"></div>
+    </div>
+
+    <div id="logged-out" class="jumbotron center text-center m-5 hidden">
+      <h1 class="display-3">Welcome to the FS Casting Agency!</h1>
+      <hr class="my-4" />
+      <h3>Please log in as an authorized user to see our movies and actors.</h3>
+    </div>
+
+    <div class="text-center mt-3 w-100 hidden">
+      <button
+        id="create-btn"
+        class="btn btn-primary btn-large my-3 mx-2"
+      ></button>
+    </div>
+
+    <nav>
+      <ul class="pagination justify-content-center m-3"></ul>
+    </nav>
+    <div class="d-flex justify-content-center">
+      <div id="content" class="d-flex flex-wrap justify-content-center"></div>
+    </div>
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content border-primary"></div>
+      </div>
+    </div>
+    <nav>
+      <ul class="pagination justify-content-center m-3"></ul>
+    </nav>
+
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/1.9/auth0-spa-js.production.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+      integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

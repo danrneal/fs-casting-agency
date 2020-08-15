@@ -4,12 +4,28 @@ Usage: flask run
 
 Attributes:
     app: A flask Flask object creating the flask app
+    ITEMS_PER_PAGE: An int representing the number of items return in a single
+        API call
 """
 
-from flask import Flask, abort, jsonify, request
+from flask import (
+    Flask,
+    abort,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_cors import CORS
 
-from auth import AuthError, requires_auth
+from auth import (
+    API_IDENTIFIER,
+    AUTH0_CLIENT_ID,
+    AUTH0_DOMAIN,
+    AuthError,
+    requires_auth,
+)
 from models import Actor, Movie, setup_db
 
 app = Flask(__name__)
@@ -87,7 +103,36 @@ def after_request(response):
     return response
 
 
-@app.route("/movies", methods=["GET"])
+@app.route("/", methods=["GET"])
+def index():
+    """Route handler for the home page.
+
+    Returns:
+        A template representing the home page
+    """
+    return render_template("index.html")
+
+
+@app.route("/auth_config", methods=["GET"])
+def auth_config():
+    """Route handler for retrieving authentication configuration.
+
+    Returns:
+        response: A json object containing the Auth0 authentication
+            configuration information
+    """
+    response = jsonify(
+        {
+            "domain": AUTH0_DOMAIN,
+            "client_id": AUTH0_CLIENT_ID,
+            "audience": API_IDENTIFIER,
+        }
+    )
+
+    return response
+
+
+@app.route("/api/movies", methods=["GET"])
 @requires_auth("read:movies")
 def get_movies():
     """Route handler for the endpoint showing paginated movies.
@@ -113,7 +158,7 @@ def get_movies():
     return response
 
 
-@app.route("/movies", methods=["POST"])
+@app.route("/api/movies", methods=["POST"])
 @requires_auth("create:movies")
 def create_movie():
     """Route handler for the endpoint for creating a new movie.
@@ -147,7 +192,7 @@ def create_movie():
     return response
 
 
-@app.route("/movies/<int:movie_id>", methods=["PATCH"])
+@app.route("/api/movies/<int:movie_id>", methods=["PATCH"])
 @requires_auth("update:movies")
 def update_movie(movie_id):
     """Route handler for endpoint updating a single movie.
@@ -199,7 +244,7 @@ def update_movie(movie_id):
     return response
 
 
-@app.route("/movies/<int:movie_id>", methods=["DELETE"])
+@app.route("/api/movies/<int:movie_id>", methods=["DELETE"])
 @requires_auth("delete:movies")
 def delete_movie(movie_id):
     """Route handler for endpoint to delete a single movie.
@@ -230,7 +275,7 @@ def delete_movie(movie_id):
     return response
 
 
-@app.route("/actors", methods=["GET"])
+@app.route("/api/actors", methods=["GET"])
 @requires_auth("read:actors")
 def get_actors():
     """Route handler for the endpoint showing paginated actors.
@@ -256,7 +301,7 @@ def get_actors():
     return response
 
 
-@app.route("/actors", methods=["POST"])
+@app.route("/api/actors", methods=["POST"])
 @requires_auth("create:actors")
 def create_actor():
     """Route handler for the endpoint for creating a new actor.
@@ -291,7 +336,7 @@ def create_actor():
     return response
 
 
-@app.route("/actors/<int:actor_id>", methods=["PATCH"])
+@app.route("/api/actors/<int:actor_id>", methods=["PATCH"])
 @requires_auth("update:actors")
 def update_actor(actor_id):
     """Route handler for endpoint updating a single actor.
@@ -347,7 +392,7 @@ def update_actor(actor_id):
     return response
 
 
-@app.route("/actors/<int:actor_id>", methods=["DELETE"])
+@app.route("/api/actors/<int:actor_id>", methods=["DELETE"])
 @requires_auth("delete:actors")
 def delete_actor(actor_id):
     """Route handler for endpoint to delete a single actor.
@@ -402,12 +447,17 @@ def bad_request(error):  # pylint: disable=unused-argument
 def not_found(error):  # pylint: disable=unused-argument
     """Error handler for 404 not found.
 
+    Redirects to the homepage unless searching for an API resource
+
     Args:
         error: unused
 
     Returns:
         Response: A json object with the error code and message
     """
+    if not request.path.startswith("/api/"):
+        return redirect(url_for("index"))
+
     response = jsonify(
         {
             "success": False,

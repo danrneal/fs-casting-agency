@@ -1,6 +1,6 @@
 /* globals Handlebars */
 
-import { addPagination, auth, flashMessage } from './utils';
+import { addPagination, auth, flashMessage } from './utils.js';
 
 /**
  *

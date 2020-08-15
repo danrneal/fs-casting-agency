@@ -1,8 +1,8 @@
 /* global createAuth0Client */
 
-import showActors from './actors';
-import showMovies from './movies';
-import { auth, flashMessage } from './utils';
+import showActors from './actors.js';
+import showMovies from './movies.js';
+import { auth, flashMessage } from './utils.js';
 
 let auth0 = null;
 

@@ -130,7 +130,7 @@ const movies = {
   updateForm(movie, template) {
     const header = `Editing: ${movie.title}`;
     const { title, release_date: releaseDate, poster } = movie;
-    let { movieActors } = movie;
+    let { actors: movieActors } = movie;
     movieActors = movieActors.map((movieActor) => movieActor.name).join(',\n');
     let movieForm = template({
       header,
@@ -167,7 +167,12 @@ const movies = {
    * @return {Object} html object containing the created modal
    */
   modal(movie, template) {
-    const { title, release_date: releaseDate, poster, movieActors } = movie;
+    const {
+      title,
+      release_date: releaseDate,
+      poster,
+      actors: movieActors,
+    } = movie;
     let movieModal = template({
       title,
       releaseDate,
@@ -224,7 +229,7 @@ const movies = {
       const movieModalTemplate = Handlebars.compile(
         document.querySelector('#movie-modal').innerHTML
       );
-      const movieModal = movies.Modal(movie, movieModalTemplate);
+      const movieModal = movies.modal(movie, movieModalTemplate);
       const modalContent = document.querySelector('.modal-content');
       modalContent.innerHTML = '';
       modalContent.appendChild(movieModal);
@@ -453,7 +458,7 @@ const actors = {
   updateForm(actor, template) {
     const header = `Editing: ${actor.name}`;
     const { name, birthdate, image } = actor;
-    let { gender, actorMovies } = actor;
+    let { gender, movies: actorMovies } = actor;
     gender = {
       male: gender === 'male' ? 'selected' : '',
       female: gender === 'female' ? 'selected' : '',
@@ -495,7 +500,7 @@ const actors = {
    * @return {Object} html object containing the created modal
    */
   modal(actor, template) {
-    const { id, name, birthdate, image, actorMovies } = actor;
+    const { id, name, birthdate, image, movies: actorMovies } = actor;
     let { gender } = actor;
     if (gender) {
       gender = actor.gender.charAt(0).toUpperCase() + actor.gender.slice(1);
@@ -506,7 +511,7 @@ const actors = {
       birthdate,
       gender,
       image,
-      actors: actorMovies,
+      movies: actorMovies,
     });
 
     const div = document.createElement('div');

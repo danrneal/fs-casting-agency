@@ -75,7 +75,7 @@ git push heroku master
 
 ## API Reference
 
-The API reference documentation is available [here](https://documenter.getpostman.com/view/10868159/SzfDxQmn?version=latest)
+The API reference documentation is available [here](https://documenter.getpostman.com/view/10868159/SzfDxQmn?version=latest).
 
 ## Example
 

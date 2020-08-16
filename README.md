@@ -32,7 +32,7 @@ Set up your environment variables:
 ```bash
 touch .env
 echo AUTH0_DOMAIN="XXX.auth0.com" >> .env
-echo AUTH0_CLIENT="XXX" >> .env
+echo AUTH0_CLIENT_ID="XXX" >> .env
 echo API_IDENTIFIER="XXX" >> .env
 echo DATABASE_URL="postgresql://XXX:5432/movies" >> .env
 ```
@@ -73,6 +73,14 @@ heroku addons:create heroku-postgresql:hobby-dev --app fs-casting-agency
 heroku pg:push movies DATABASE_URL --app fs-casting-agency
 git push heroku master
 ```
+
+## Screenshots
+
+![FS Casting Agency Home Page](https://i.imgur.com/8dMWCwG.png)
+
+![FS Casting Agency Modal](https://i.imgur.com/DfeWQku.png)
+
+![FS Casting Agency Update Form](https://i.imgur.com/VHw8Wwb.png)
 
 ## API Reference
 

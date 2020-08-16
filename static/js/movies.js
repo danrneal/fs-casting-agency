@@ -260,7 +260,7 @@ class Movie {
       document.querySelector('#movie-card').innerHTML
     );
     let year;
-    if (this.releaseDate) year = this.releaseDate.split('-');
+    if (this.releaseDate) [year] = this.releaseDate.split('-');
     let card = cardTemplate({
       title: this.title,
       year,

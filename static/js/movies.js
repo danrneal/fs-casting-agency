@@ -3,13 +3,19 @@
 import { addPagination, auth, flashMessage } from './utils.js';
 
 /**
- *
+ * @description Class representing a movie.
+ * @class
  */
 class Movie {
   /**
-   *
-   * @param {*} movie
-   * @param {*} callback
+   * @callback movieCallback
+   * @param {number} page - number of page to retrieve data for
+   */
+
+  /**
+   * @description Create a Movie object
+   * @param {Object} movie - object containing data for the movie to create
+   * @param {movieCallback} callback - callback function to be called after a db change
    */
   constructor(movie, callback) {
     this.id = movie.id;
@@ -22,7 +28,7 @@ class Movie {
 
   /**
    * @description Create a new movie in the db
-   * @param {Object} form - form containing data for movie to create
+   * @param {Object} form - form containing data for the movie to create
    */
   create(form) {
     const actors = form.actors.value

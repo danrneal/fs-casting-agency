@@ -3,13 +3,19 @@
 import { addPagination, auth, flashMessage } from './utils.js';
 
 /**
- *
+ * @description Class representing an actor.
+ * @class
  */
 class Actor {
   /**
-   *
-   * @param {*} actor
-   * @param {*} callback
+   * @callback actorCallback
+   * @param {number} page - number of page to retrieve data for
+   */
+
+  /**
+   * @description Create an Actor object
+   * @param {Object} actor - object containing data of the actor to create
+   * @param {actorCallback} callback - callback function to be called after a db change
    */
   constructor(actor, callback) {
     this.id = actor.id;
@@ -23,7 +29,7 @@ class Actor {
 
   /**
    * @description Create a new actor in the db
-   * @param {Object} form - form containing data for actor to create
+   * @param {Object} form - form containing data for the actor to create
    */
   create(form) {
     const movies = form.movies.value
@@ -301,7 +307,7 @@ class Actor {
 
 /**
  * @description Fetch actors and add them to the page
- * @param {number} page - page number to retrieve movies for
+ * @param {number} page - page number to retrieve actors for
  */
 export default function showActors(page) {
   const navActors = document.querySelector('#nav-actors');

@@ -323,7 +323,8 @@ export default function showActors(page) {
     createBtn.innerHTML = '&#10010; CREATE NEW ACTOR';
     createBtn.parentElement.classList.remove('hidden');
     createBtn.onclick = () => {
-      const newActorForm = Actor.creationForm();
+      const newActor = new Actor({}, showActors);
+      const newActorForm = newActor.creationForm();
       const modalContent = document.querySelector('.modal-content');
       modalContent.innerHTML = '';
       modalContent.appendChild(newActorForm);

@@ -301,7 +301,8 @@ export default function showMovies(page) {
     createBtn.innerHTML = '&#10010; CREATE NEW MOVIE';
     createBtn.parentElement.classList.remove('hidden');
     createBtn.onclick = () => {
-      const newMovieForm = Movie.creationForm();
+      const newMovie = new Movie({}, showMovies);
+      const newMovieForm = newMovie.creationForm();
       const modalContent = document.querySelector('.modal-content');
       modalContent.innerHTML = '';
       modalContent.appendChild(newMovieForm);
